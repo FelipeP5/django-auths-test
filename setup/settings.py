@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from django.utils.encoding import force_bytes
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,9 +46,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'setup.urls'
 
 TEMPLATES = [
@@ -145,11 +147,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Toda a configuração de CustomUser dá um erro de "autenticador.customuser could not be resolved"
 # se posta antes do primeiro migrate... *shrug*
 AUTH_USER_MODEL = 'autenticador.customuser'
-CORS_ALLOW_ALL_ORIGINS = True
 
+    # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "SIGNING_KEY": SECRET_KEY, # Essa configuração padrão é preferivelmente alterada
-    # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+    # Configurações padrão
+    "SIGNING_KEY": force_bytes(SECRET_KEY), # Preferivelmente alterada
+    "ALGORITHM": "HS256",
+    "AUTH_HEADER_TYPES": 'Bearer'
 }
